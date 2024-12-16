@@ -1,0 +1,57 @@
+import streamlit as st
+
+def calculate_seat_and_participant_split(budget, seat_cost, credit_cost, split_percentage):
+    """
+    Calculate the number of seats and participants based on a dynamic split percentage.
+    """
+    seat_budget = budget * (split_percentage / 100)
+    participant_budget = budget * ((100 - split_percentage) / 100)
+    
+    seats = int(seat_budget // seat_cost)
+    participants = int(participant_budget // credit_cost)
+    
+    seat_cost_total = seats * seat_cost
+    participant_cost_total = participants * credit_cost
+    total_cost = seat_cost_total + participant_cost_total
+    
+    return seats, participants, seat_cost_total, participant_cost_total, total_cost
+
+# Streamlit Interface
+st.title("Dynamic Budget Calculator")
+
+# Inputs Section
+st.sidebar.header("Inputs")
+annual_budget = st.sidebar.number_input("Annual Budget ($)", min_value=0, value=10000, step=1000)
+seat_cost = st.sidebar.number_input("Cost per Seat ($/year)", min_value=1, value=2500)
+credit_cost = st.sidebar.number_input("Cost per Participant Credit ($/year)", min_value=1, value=10)
+
+# Slider for Split Percentage
+split_percentage = st.sidebar.slider("Split Percentage for Seats (%)", min_value=0, max_value=100, value=50, step=1)
+
+# Perform Calculations
+seats, participants, seat_cost_total, participant_cost_total, total_cost = calculate_seat_and_participant_split(
+    annual_budget, seat_cost, credit_cost, split_percentage
+)
+
+# Output Results
+st.header("Results")
+col1, col2 = st.columns(2)
+with col1:
+    st.subheader("Seats")
+    st.write(f"Number of Seats: **{seats}**")
+    st.write(f"Cost for Seats: **${seat_cost_total:,}**")
+
+with col2:
+    st.subheader("Participants")
+    st.write(f"Number of Participants: **{participants}**")
+    st.write(f"Cost for Participants: **${participant_cost_total:,}**")
+
+st.subheader("Total Cost")
+st.write(f"**${total_cost:,}** out of ${annual_budget:,} budget")
+
+# Visualization
+st.progress(min(total_cost / annual_budget, 1.0))
+st.write("Budget Utilization: {:.1f}%".format((total_cost / annual_budget) * 100))
+
+
+
